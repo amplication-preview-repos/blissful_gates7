@@ -1,0 +1,89 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Item {
+  availabilityStatus Boolean?
+  createdAt          DateTime    @default(now())
+  description        String?
+  id                 String      @id @default(auto()) @map("_id") @db.ObjectId
+  name               String?
+  price              Float?
+  promoActive        Boolean?
+  promoPrice         Float?
+  rating             Float?
+  restaurant         Restaurant? @relation(fields: [restaurantId], references: [id])
+  restaurantId       String?     @db.ObjectId
+  updatedAt          DateTime    @updatedAt
+}
+
+model Restaurant {
+  contactPhone String?
+  createdAt    DateTime @default(now())
+  description  String?
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  items        Item[]
+  location     Json?
+  name         String?
+  rating       Float?
+  updatedAt    DateTime @updatedAt
+}
+
+model Category {
+  createdAt DateTime @default(now())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String?
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  createdAt       DateTime              @default(now())
+  deliveryAddress Json?
+  id              String                @id @default(auto()) @map("_id") @db.ObjectId
+  orderStatus     EnumOrderOrderStatus?
+  orderedItems    Json?
+  paymentMethod   Json?
+  timestamp       DateTime?
+  totalCost       Float?
+  updatedAt       DateTime              @updatedAt
+  user            User?                 @relation(fields: [userId], references: [id])
+  userId          String?               @db.ObjectId
+}
+
+model Promotion {
+  createdAt   DateTime  @default(now())
+  description String?
+  discount    Float?
+  expiryDate  DateTime?
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String?
+  updatedAt   DateTime  @updatedAt
+}
+
+model User {
+  addresses          Json?
+  avatar             Json?
+  createdAt          DateTime  @default(now())
+  dateOfRegistration DateTime?
+  email              String?   @unique
+  favoriteItems      Json?
+  firstName          String?
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  lastName           String?
+  orders             Order[]
+  password           String
+  paymentMethods     Json?
+  phoneNumber        String?
+  roles              Json
+  updatedAt          DateTime  @updatedAt
+  username           String    @unique
+}
+
+enum EnumOrderOrderStatus {
+  Option1
+}
